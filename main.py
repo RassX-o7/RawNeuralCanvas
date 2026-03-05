@@ -478,6 +478,9 @@ class Draw_Canvas:
         self.pil_img=Image.new("L",size=(280,280),color=0)
         self.draw_img=ImageDraw.Draw(self.pil_img)
         self.small_img=None
+        self.pred_var=tk.StringVar(value="")
+        self.pred_label = ttk.Label(self.window,textvariable=self.pred_var)
+        self.pred_label.pack(before=self.clrButton)
     @staticmethod
     def _preprocess(image):
         sumX=0
@@ -512,6 +515,8 @@ class Draw_Canvas:
             self.NN.forward(self.drawImg_array)
             prediction=self.NN.model_activations[-1].argmax()
             confidence=self.NN.model_activations[-1][prediction]
+            var="is certain" if confidence[0]*100>80 else "thinks" 
+            self.pred_var.set(value=f"---- The Model {var} its a {prediction} !! ----")
             print(f"Prediction : {prediction} , Confidence : {confidence*100}")
     def viewImg(self):
         if not self.small_img :
@@ -552,7 +557,7 @@ class MNIST_viewer:
         self.index+=1
 
 base=os.path.dirname(os.path.abspath(__file__))
-data_zip_in_built=np.load(os.path.join(base,"trainedModel","NNmodel_light2_16"))
+data_zip_in_built=np.load(os.path.join(base,"trainedModel","NNmodel_light2_16.npz"))
 layers=len(data_zip_in_built)//2
 weights_inbuilt=[data_zip_in_built[f"w_{layer}"] for layer in range(layers)]
 bias_inbuilt=[data_zip_in_built[f"b_{layer}"] for layer in range(layers)]
