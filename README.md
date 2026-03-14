@@ -35,3 +35,5 @@ Draw a digit on the canvas and let the trained neural network predict it.
 - Different Cost functions such as cross-entropy
 - Adam optimizer, variable learning rate
 - Validation set tracking
+- Auto - encoders
+- CNNs 
