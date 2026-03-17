@@ -289,11 +289,11 @@ class DataSet:
     def __init__(self,mode):
         self.mode=mode
         if self.mode == "train":
-            image_path="dataset/train-images.idx3-ubyte"
-            label_path="dataset/train-labels.idx1-ubyte"
+            image_path=os.path.join(base,"dataset/train-images.idx3-ubyte")
+            label_path=os.path.join(base,"dataset/train-labels.idx1-ubyte")
         elif self.mode == "test":
-            image_path="dataset/t10k-images.idx3-ubyte"
-            label_path="dataset/t10k-labels.idx1-ubyte"
+            image_path=os.path.join(base,"dataset/t10k-images.idx3-ubyte")
+            label_path=os.path.join(base,"dataset/t10k-labels.idx1-ubyte")
         with open(image_path,"rb") as images_file:
             header=images_file.read(16) 
             images=np.frombuffer(images_file.read(),dtype=np.uint8)/255
