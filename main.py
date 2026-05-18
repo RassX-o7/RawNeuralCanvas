@@ -177,6 +177,7 @@ class TrainingTweaker:
         ttk.Checkbutton(self.Frame2,text="Save Weights and Biases locally" ,onvalue=True,offvalue=False,variable=self.save_wb).pack() 
         ttk.Checkbutton(self.Frame2,text="Training Visualizer ( Heavy on System )" ,onvalue=True,offvalue=False,variable=self.visual).pack() 
         ttk.Label(self.Frame2,text=" ").pack()
+        self.def_set=ttk.Button(self.Frame2,text="Set to default",command=self.Set_default)
         self.layers_num=tk.IntVar(value="1") 
         self.setWarn = None
         ttk.Label(self.Frame2,text="Enter the Number of MLP layers (MAX is 6): ").pack()
@@ -188,12 +189,17 @@ class TrainingTweaker:
         self.back_btn=ttk.Button(self.Frame2,text="Back to Previous Page",command=self.back)
         self.back_btn.pack()
         self.setWarnlabel=ttk.Label(self.Frame2,text="Please LOCK the number of layers First")
-        self.trainButton=ttk.Button(self.Frame2,text="Train Model",command=self.train_model,width=10)
+        self.trainButton=ttk.Button(self.Frame2,text="Train Model",command=self.train_model,width=15)
+        self.def_set.pack()
         self.trainButton.pack()
         self.Frame1.pack()
         self.layer_sliders_vars=[] 
         self.neuron_var=tk.StringVar()
         self.neurons_label=ttk.Label(self.Frame2,textvariable=self.neuron_var)
+    def Set_default(self):
+        self.window.destroy()
+        new_window=tk.Toplevel(self.app.window)
+        self.app.train_interfaceX=TrainingTweaker(new_window,self.app)
     def back(self):
         self.Frame2.pack_forget()
         self.Frame1.pack()
@@ -515,7 +521,7 @@ class Draw_Canvas:
             self.NN.forward(self.drawImg_array)
             prediction=self.NN.model_activations[-1].argmax()
             confidence=self.NN.model_activations[-1][prediction]
-            var="is certain" if confidence[0]*100>80 else "thinks" 
+            var="is certain" if confidence[0]*100>80 else "thinks maybe" if confidence[0]*100>60 else "isnt sure at all but thinks"
             self.pred_var.set(value=f"---- The Model {var} its a {prediction} !! ----")
             print(f"Prediction : {prediction} , Confidence : {confidence*100}")
     def viewImg(self):
