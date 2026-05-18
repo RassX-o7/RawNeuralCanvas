@@ -8,6 +8,14 @@ from PIL import Image,ImageDraw,ImageTk
 from tkinter import filedialog
 import os
 import threading
+#add kill functionality 
+#if app killed , everything else
+class ComapreModels():
+    ...
+class EvaluateModel():
+    #implement visualizer index , type of evaluation? want confusion matrix etc
+    #but evaluation mean everything
+    ...
 class NeuralNet:
     def __init__(self,weights,biases):
         self.weights_list=weights
@@ -62,7 +70,7 @@ class App:
     DigitRandomNN=NeuralNet(weights=[np.random.randn(y,x)*np.sqrt(1/x) for x,y in zip([784,16,16],[16,16,10])],biases=[np.zeros((y,1)) for y in [16,16,10]])
     def __init__(self,window,dataset):
         self.window=window
-        self.window.geometry("400x400")
+        self.window.geometry("400x450")
         self.dataset=dataset
         ttk.Label(self.window,text="\n").pack()
         self.button1=ttk.Button(self.window,text=" TRAIN NETWORK", command=self.train_interface)
@@ -70,7 +78,9 @@ class App:
         self.button3=ttk.Button(self.window,text=" CANVAS DRAW PREDICTION", command=self.draw_canvas)
         self.button4=ttk.Button(self.window,text=" LOAD IN-BUILT PRE-TRAINED MODEL [16,16]", command=self.load_in_built)
         self.button5=ttk.Button(self.window,text=" LOAD UNTRAINED MODEL [16,16]", command=self.load_untrained)
-        self.button6=ttk.Button(self.window,text=" UPLOAD PRE-TRAINED MODEL", command=self.load_weights_biases)
+        self.button6=ttk.Button(self.window,text=" FEED IN PRE-TRAINED MODEL", command=self.load_weights_biases)
+        self.button7=ttk.Button(self.window,text=" COMPARE TWO MODELS", command=self.compare_models)
+        self.button8=ttk.Button(self.window,text=" EVALUTE YOUR MODEL", command=self.eval_model)
         self.button1.pack()
         ttk.Label(self.window,text=" ").pack()
         self.button2.pack()
@@ -82,8 +92,22 @@ class App:
         self.button5.pack()
         ttk.Label(self.window,text=" ").pack()
         self.button6.pack()
+        ttk.Label(self.window,text=" ").pack()
+        self.button7.pack()
+        ttk.Label(self.window,text=" ").pack()
+        self.button8.pack()
         self.model_trained=False
         self.train_warn_label=ttk.Label(self.window,text="\nPlease Train a New Model OR Load Pre-Trained Model") 
+    def compare_models(self):
+        pass
+    def eval_model(self):
+        if self.model_trained:
+            self.train_warn_label.pack_forget()
+            tester=Tester(self.model,self.dataset)
+            tester.testing()
+        else:
+            self.train_warn_label.pack_forget()
+            self.train_warn_label.pack()
     def load_in_built(self):
         self.train_warn_label.pack_forget()
         self.model_trained=True
@@ -119,7 +143,7 @@ class App:
             print("train new")
             self.train_warn_label.pack()
             return
-        if hasattr(self,"window3") and self.window3.winfo_exists():
+        if hasattr(self,"window3") and self.window3.winfo_exists(): # 2nd if for case when window 3 created prev but closed rn(crossed), i suppose
             self.window3.lift()
             self.window3.focus() 
             return
@@ -383,7 +407,7 @@ class Trainer:
             ax.set_ylim(bottom=0,top=3)
             linex,=ax.plot(range(len(self.cost_history)),self.cost_history)
         for epoch in tqdm(range(self.epochs)):
-            print("\n")
+            # print("\n") # uncheck for progress seperator
             running_sum=0
             weights_sum=[np.zeros((y,x)) for x,y in zip(self.NN.layer_sizes[:-1],self.NN.layer_sizes[1:])]
             biases_sum=[np.zeros((y,1)) for y in self.NN.layer_sizes[1:]]
@@ -429,7 +453,7 @@ class Trainer:
                 save_dict[f"b_{layer}"]=array
             np.savez(file=file_path,**save_dict)
 class Tester:
-    def __init__(self,NeuralNet:NeuralNet,test_dataset: DataSet,test_size=10000,visualizer=True):
+    def __init__(self,NeuralNet:NeuralNet,test_dataset: DataSet,test_size=10000,visualizer=False):
         self.NN=NeuralNet
         self.testSet=test_dataset
         self.test_size=test_size
@@ -439,26 +463,30 @@ class Tester:
         self.FP_pred=[]
         self.FP_confidence=[]
     def testing(self):
+        correct=0
         for index in np.random.permutation(self.test_size):
             test_image,true_label=self.testSet.get(index)
             test_image_array=test_image.flatten().reshape(-1,1)
             self.NN.forward(input_matrix=test_image_array)
-            prediction=self.NN.model_activations[-1].argmax()
+            prediction=self.NN.model_activations[-1].argmax() # since index itself is prediction
             confidence=self.NN.model_activations[-1][prediction]
             if self.visulaizer is True:
                 plt.imshow(test_image,cmap="gray")
                 plt.title(f"Correct Label is {true_label} and predicted label is {prediction} confidence is {confidence*100}%")
                 plt.show()
-            else:
-                if prediction!=true_label:
-                    self.false_positives.append(test_image)
-                    self.FP_true.append(true_label)
-                    self.FP_pred.append(prediction)
-                    self.FP_confidence.append(confidence)
-        for image,prediction,true,confidence in zip(self.false_positives,self.FP_pred,self.FP_true,self.FP_confidence):
-            plt.imshow(image,cmap="gray")
-            plt.title(f"Correct Label is {true} and predicted label is {prediction} with {confidence*100}% accuracy")
-            plt.show()
+            if prediction!=true_label:
+                self.false_positives.append(test_image)
+                self.FP_true.append(true_label)
+                self.FP_pred.append(prediction)
+                self.FP_confidence.append(confidence)
+                continue
+            correct+=1
+        print(f"Out of {self.test_size} test samples , total {correct} were properly recognized ")
+        print(f"ACCURACY = {correct/self.test_size*100:.3f} %")
+        # for image,prediction,true,confidence in zip(self.false_positives,self.FP_pred,self.FP_true,self.FP_confidence):
+        #     plt.imshow(image,cmap="gray")
+        #     plt.title(f"Correct Label is {true} and predicted label is {prediction} with {confidence*100}% accuracy")
+        #     plt.show()
 class Draw_Canvas:
     def __init__(self,window: tk.Tk,pred_model:NeuralNet):
         self.window=window
