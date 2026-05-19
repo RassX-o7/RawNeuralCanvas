@@ -34,19 +34,19 @@ class Tester:
         print(self.pred_labels)
         print(f"Out of {self.test_size} test samples , total {correct} were properly recognized ")
         print(f"ACCURACY = {correct/self.test_size*100:.3f} %")
-        # rows=np.array(self.true_labels.values())
-        print(self.cm)
+        print("confusion matrix ",self.cm,end="\n")
+
         fig,axes=plt.subplots()
-        # axes.title(f"Overall Model Acuuracy : {correct/self.test_size*100:.3f}")
         axes.set_title(f"--Overall Model Acuuracy : {correct/self.test_size*100:.3f}%--\nHeat Map based on Confusion matrix")
-        heatmap=axes.imshow(self.cm, cmap="hot")
-        # axes.xlabel("Predicted Label")
+        heatmap=axes.imshow(self.cm, cmap="berlin")
         axes.set_xlabel("Predicted Label")
-        # axes.ylabel("True Label")
         axes.set_ylabel("True Label")
         axes.set_xticks(range(10))
         axes.set_yticks(range(10))
         fig.colorbar(heatmap,ax=axes,label="count")
+        for i in range(10):
+            for j in range(10):
+                axes.text(i,j,self.cm[i][j],color="white",ha="center",va="center")# Horiz/vertical alligment set to lower left sm , hover and check , ha va is short kward
         plt.show()  
 if __name__=="main":
     ...
