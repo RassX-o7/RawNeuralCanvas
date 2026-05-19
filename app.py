@@ -62,7 +62,7 @@ class App:
 
         if self.compare_model_1_label.winfo_ismapped() and ( not self.compare_model_2_label.winfo_ismapped()):
             self.compare_model_2_label.pack()
-        if 
+        if self.model:
             self.model_1 = self.model
 
         self.compare_model_1_label.pack()
