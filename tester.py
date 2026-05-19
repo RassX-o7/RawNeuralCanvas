@@ -32,11 +32,10 @@ class Tester:
                 plt.show()
             if not prediction!=true_label:
                 correct+=1
-        self.cm_true=self.cm_true.T
         print(self.true_labels)
         print(self.pred_labels)
         print(f"Out of {self.test_size} test samples , total {correct} were properly recognized ")
         print(f"ACCURACY = {correct/self.test_size*100:.3f} %")
-        print("confusion matrix ",self.cm_true.T,end="\n")        
+        print("confusion matrix ",self.cm_true,end="\n")        
 if __name__=="main":
     ...
