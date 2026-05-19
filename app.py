@@ -44,10 +44,28 @@ class App:
         self.button7.pack()
         ttk.Label(self.window,text=" ").pack()
         self.button8.pack()
-        self.model_trained=False
+        self.model_trained = False
+        self.model=None
+        self.model1_trained = False
+        self.model2_trained = False
         self.train_warn_label=ttk.Label(self.window,text="\nPlease Train a New Model OR Load Pre-Trained Model") 
+        self.compare_model_1_label = ttk.Label(self.window,text="Please Load Model 1, then click compare again")
+        self.compare_model_2_label = ttk.Label(self.window,text="Please Load Model 2, then click compare")
+        self.compModel_1 = None
+        self.compModel_2 = None
+
     def compare_models(self):
-        pass
+        self.train_warn_label.pack_forget() # need if someone want to eval a model say but havent slected any model so warning is displayed but now wished to comp 2 models so this waning must be removed
+        if (not self.compare_model_2_label.winfo_ismapped()) and (( not self.compare_model_2_label.winfo_ismapped())):
+            self.model=None
+            self.compare_model_1_label.pack()
+
+        if self.compare_model_1_label.winfo_ismapped() and ( not self.compare_model_2_label.winfo_ismapped()):
+            self.compare_model_2_label.pack()
+        if 
+            self.model_1 = self.model
+
+        self.compare_model_1_label.pack()
     def eval_model(self):
         if self.model_trained:
             self.train_warn_label.pack_forget()
