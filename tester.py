@@ -14,7 +14,8 @@ class Tester:
         self.true_labels={}
         self.pred_labels={}
         # self.cm=np.zeros((10,10)) # otherwise values in 9.00e10 etc 
-        self.cm=np.zeros((10,10),dtype=int)
+        self.cm_true = np.zeros((10,10),dtype=int)
+        self.cm_ideal = np.zeros((10,10),dtype=int)
         for index in np.random.permutation(self.test_size):
             test_image,true_label=self.testSet.get(index)
             test_image_array=test_image.flatten().reshape(-1,1)
@@ -23,30 +24,37 @@ class Tester:
             confidence=self.NN.model_activations[-1][prediction]
             self.true_labels[int(true_label)]=self.true_labels.get(int(true_label),0)+1
             self.pred_labels[int(prediction)]=self.pred_labels.get(int(prediction),0)+1
-            self.cm[true_label][prediction]+=1
+            self.cm_true[true_label][prediction]+=1
+            self.cm_ideal[true_label][true_label]+=1
+
             if self.visulaizer is True: 
                 plt.imshow(test_image,cmap="gray")
                 plt.title(f"Correct Label is {true_label} and predicted label is {prediction} confidence is {confidence*100}%")
                 plt.show()
             if not prediction!=true_label:
                 correct+=1
+        self.cm_true=self.cm_true.T
         print(self.true_labels)
         print(self.pred_labels)
         print(f"Out of {self.test_size} test samples , total {correct} were properly recognized ")
         print(f"ACCURACY = {correct/self.test_size*100:.3f} %")
-        print("confusion matrix ",self.cm,end="\n")
-
-        fig,axes=plt.subplots()
-        axes.set_title(f"--Overall Model Acuuracy : {correct/self.test_size*100:.3f}%--\nHeat Map based on Confusion matrix")
-        heatmap=axes.imshow(self.cm, cmap="berlin")
-        axes.set_xlabel("Predicted Label")
-        axes.set_ylabel("True Label")
-        axes.set_xticks(range(10))
-        axes.set_yticks(range(10))
-        fig.colorbar(heatmap,ax=axes,label="count")
+        print("confusion matrix ",self.cm_true.T,end="\n")
+        fig,axs=plt.subplots(1,2,figsize=(12,6))
+        axs[0].set_title(f"--Overall Model Acuuracy : {correct/self.test_size*100:.3f}%--\nHeat Map based on Confusion matrix")
+        axs[1].set_title(f"Ideal Model with 100% accuracy")
+        heatmap_true=axs[0].imshow(self.cm_true, cmap="berlin")
+        heatmap_ideal=axs[1].imshow(self.cm_ideal, cmap="berlin")
+        for a in range(2):
+            axs[a].set_xlabel("Predicted Label")
+            axs[a].set_ylabel("True Label")
+            axs[a].set_xticks(range(10))
+            axs[a].set_yticks(range(10))
+        fig.colorbar(heatmap_true,ax=axs[0],label="count")
+        fig.colorbar(heatmap_ideal,ax=axs[1],label="count")
         for i in range(10):
             for j in range(10):
-                axes.text(i,j,self.cm[i][j],color="white",ha="center",va="center")# Horiz/vertical alligment set to lower left sm , hover and check , ha va is short kward
-        plt.show()  
+                axs[0].text(i,j,self.cm_true[i][j],color="white",ha="center",va="center")
+                axs[1].text(i,j,self.cm_ideal[i][j],color="white",ha="center",va="center")
+        plt.show()
 if __name__=="main":
     ...
