@@ -13,7 +13,8 @@ class Tester:
         correct=0
         self.true_labels={}
         self.pred_labels={}
-        self.cm=np.zeros((10,10))
+        # self.cm=np.zeros((10,10)) # otherwise values in 9.00e10 etc 
+        self.cm=np.zeros((10,10),dtype=int)
         for index in np.random.permutation(self.test_size):
             test_image,true_label=self.testSet.get(index)
             test_image_array=test_image.flatten().reshape(-1,1)
@@ -35,6 +36,17 @@ class Tester:
         print(f"ACCURACY = {correct/self.test_size*100:.3f} %")
         # rows=np.array(self.true_labels.values())
         print(self.cm)
-
+        fig,axes=plt.subplots()
+        # axes.title(f"Overall Model Acuuracy : {correct/self.test_size*100:.3f}")
+        axes.set_title(f"--Overall Model Acuuracy : {correct/self.test_size*100:.3f}%--\nHeat Map based on Confusion matrix")
+        heatmap=axes.imshow(self.cm, cmap="hot")
+        # axes.xlabel("Predicted Label")
+        axes.set_xlabel("Predicted Label")
+        # axes.ylabel("True Label")
+        axes.set_ylabel("True Label")
+        axes.set_xticks(range(10))
+        axes.set_yticks(range(10))
+        fig.colorbar(heatmap,ax=axes,label="count")
+        plt.show()  
 if __name__=="main":
     ...
