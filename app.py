@@ -11,6 +11,7 @@ from mnistViewer import MNIST_viewer
 # from dataset import * # this fixed
 from dataset import train_dataset,test_dataset
 from tweaker import TrainingTweaker
+from compare import Compare
 from drawCanvas import Draw_Canvas
 import os
 
@@ -50,8 +51,10 @@ class App:
     def eval_model(self):
         if self.model_trained:
             self.train_warn_label.pack_forget()
-            tester=Tester(self.model,self.dataset)
-            tester.testing()
+            tester1=Tester(self.model,self.dataset)
+            tester1.testing()
+            compare_ideal=Compare(tester1,tester1,eval=True)
+            compare_ideal.compare()
         else:
             self.train_warn_label.pack_forget()
             self.train_warn_label.pack()
