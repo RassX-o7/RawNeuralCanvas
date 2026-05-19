@@ -15,7 +15,6 @@ from drawCanvas import Draw_Canvas
 import os
 
 class App:
-    DigitRandomNN=NeuralNet(weights=[np.random.randn(y,x)*np.sqrt(1/x) for x,y in zip([784,16,16],[16,16,10])],biases=[np.zeros((y,1)) for y in [16,16,10]])
     def __init__(self,window,dataset):
         self.window=window
         self.window.geometry("400x450")
@@ -25,7 +24,7 @@ class App:
         self.button2=ttk.Button(self.window,text=" MNIST VIEWER", command=self.show_viewer)
         self.button3=ttk.Button(self.window,text=" CANVAS DRAW PREDICTION", command=self.draw_canvas)
         self.button4=ttk.Button(self.window,text=" LOAD IN-BUILT PRE-TRAINED MODEL [16,16]", command=self.load_in_built)
-        self.button5=ttk.Button(self.window,text=" LOAD UNTRAINED MODEL [16,16]", command=self.load_untrained)
+        self.button5=ttk.Button(self.window,text=" LOAD RANODM UNTRAINED MODEL [16,16]", command=self.load_untrained)
         self.button6=ttk.Button(self.window,text=" FEED IN PRE-TRAINED MODEL", command=self.load_weights_biases)
         self.button7=ttk.Button(self.window,text=" COMPARE TWO MODELS", command=self.compare_models)
         self.button8=ttk.Button(self.window,text=" EVALUTE YOUR MODEL", command=self.eval_model)
@@ -69,9 +68,11 @@ class App:
         self.model=NeuralNet(weights_list,biases_list)
         self.model_trained=True
     def load_untrained(self):
+        #LOAD random each time
+        DigitRandomNN=NeuralNet(weights=[np.random.randn(y,x)*np.sqrt(1/x) for x,y in zip([784,16,16],[16,16,10])],biases=[np.zeros((y,1)) for y in [16,16,10]])
         self.train_warn_label.pack_forget()
         self.model_trained=True
-        self.model=App.DigitRandomNN
+        self.model=DigitRandomNN
     def show_viewer(self):
         if hasattr(self,"window2") and self.window2.winfo_exists():
             self.window2.lift() 
