@@ -15,6 +15,8 @@ Draw a digit on the canvas and let the trained neural network predict it.
 - Tkinter GUI with full training interface for tweaking parameters
 - Canvas draw prediction — draw a digit, get a prediction using your model
 - Model saving and loading using `.npz` 
+- Evaluation of model using its accuracy and confusion matrix 
+- Comparision of two models based on individual eval
 
 ## How to Run
 1. Clone the repo
@@ -28,12 +30,13 @@ Draw a digit on the canvas and let the trained neural network predict it.
 
 **Currently Implementing**
 - Threaded training so GUI stays responsive during training
-- Accuracy evaluation and confusion matrix
+- Validation set tracking
+- kill functionality
+- exploring more evaluation methods
 
 **Planned**
 - Integration of multiple activation functions (ReLU, Softmax) and weight initializations
 - Different Cost functions such as cross-entropy
 - Adam optimizer, variable learning rate
-- Validation set tracking
 - Auto - encoders
 - CNNs 
