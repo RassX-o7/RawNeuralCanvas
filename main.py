@@ -8,8 +8,8 @@ from PIL import Image,ImageDraw,ImageTk
 from tkinter import filedialog
 import os
 import threading
-from app import App
-from dataset import DataSet
+from ui.app import App
+from core.dataset import DataSet
 
 def main():
     train_dataset = DataSet(mode="train")

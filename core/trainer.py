@@ -1,12 +1,14 @@
-from neuralNet import NeuralNet
+# from core.neuralNet import NeuralNet
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import os
-from dataset import DataSet
-
+# from core.dataset import DataSet
+base=os.path.dirname(os.path.abspath(__file__)) # abspath return the absolute path of file with script name too ../scripy.py
+base_root=os.path.dirname(base)
+save_loc=os.path.join(base_root,"trainedModel") # need to add \ otherwise, trainedModel gets added to name
 class Trainer:
-    def __init__(self,NeuralNet:NeuralNet,train_dataset:DataSet,epochs=10,dataset=60000,mode="SGD",Visulaizer=False,save=False,save_loc="trainedModel/",batch_size=1,hyperparam=0.05,augment=False,per_update=500):
+    def __init__(self,NeuralNet,train_dataset,epochs=10,dataset=60000,mode="SGD",Visulaizer=False,save=False,save_loc=save_loc+"\\",batch_size=1,hyperparam=0.05,augment=False,per_update=500):
         self.NN=NeuralNet
         self.dataset=train_dataset
         self.hyperparam=hyperparam

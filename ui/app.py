@@ -2,17 +2,17 @@ import tkinter as tk
 from tkinter import ttk
 import matplotlib.pyplot as plt
 import numpy as np
-from neuralNet import NeuralNet
+from core.neuralNet import NeuralNet
 from tkinter import filedialog
-from tester import Tester
-from mnistViewer import MNIST_viewer
+from core.tester import Tester
+from ui.mnistViewer import MNIST_viewer
 # from dataset import DataSet,train_dataset,test_dataset
 # import dataset no fix
 # from dataset import * # this fixed
-from dataset import train_dataset,test_dataset
-from tweaker import TrainingTweaker
-from compare import Compare
-from drawCanvas import Draw_Canvas
+from core.dataset import train_dataset,test_dataset
+from ui.tweaker import TrainingTweaker
+from ui.compare import Compare
+from ui.drawCanvas import Draw_Canvas
 import os
 
 class App:
@@ -130,7 +130,8 @@ class App:
         self.canvas=Draw_Canvas(self.window3,self.model)
 
 base=os.path.dirname(os.path.abspath(__file__))
-data_zip_in_built=np.load(os.path.join(base,"trainedModel","NNmodel_light2_16.npz"))
+base_root=os.path.dirname(base)
+data_zip_in_built=np.load(os.path.join(base_root,"trainedModel","NNmodel_light2_16.npz"))
 layers=len(data_zip_in_built)//2
 weights_inbuilt=[data_zip_in_built[f"w_{layer}"] for layer in range(layers)]
 bias_inbuilt=[data_zip_in_built[f"b_{layer}"] for layer in range(layers)]

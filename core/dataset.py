@@ -6,11 +6,11 @@ class DataSet:
     def __init__(self,mode):
         self.mode=mode
         if self.mode == "train":
-            image_path=os.path.join(base,"dataset/train-images.idx3-ubyte")
-            label_path=os.path.join(base,"dataset/train-labels.idx1-ubyte")
+            image_path=os.path.join(base_root,"dataset/train-images.idx3-ubyte")
+            label_path=os.path.join(base_root,"dataset/train-labels.idx1-ubyte")
         elif self.mode == "test":
-            image_path=os.path.join(base,"dataset/t10k-images.idx3-ubyte")
-            label_path=os.path.join(base,"dataset/t10k-labels.idx1-ubyte")
+            image_path=os.path.join(base_root,"dataset/t10k-images.idx3-ubyte")
+            label_path=os.path.join(base_root,"dataset/t10k-labels.idx1-ubyte")
         with open(image_path,"rb") as images_file:
             header=images_file.read(16) 
             images=np.frombuffer(images_file.read(),dtype=np.uint8)/255
@@ -53,6 +53,11 @@ class DataSet:
         if augment:
             return DataSet._augment(self.dataset_images[index]),self.dataset_labels[index]
         return self.dataset_images[index],self.dataset_labels[index]
-base=os.path.dirname(os.path.abspath(__file__))
+
+base=os.path.dirname(os.path.abspath(__file__)) # abspath return the absolute path of file with script name too ../scripy.py
+# print(base)
+base_root=os.path.dirname(base) # dirname rips the last thing from path , i.e returns in which directory this path lives , so goes one level up
+# print(base_root)
+
 train_dataset=DataSet(mode="train")
 test_dataset=DataSet(mode="test")

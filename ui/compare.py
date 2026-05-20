@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
-from neuralNet import NeuralNet
-from tester import Tester
+from core.neuralNet import NeuralNet
+from core.tester import Tester
 
 class Compare:
     def __init__(self,tester1: Tester, tester2: Tester,eval = False):

@@ -1,10 +1,10 @@
 from __future__ import annotations
 import tkinter as tk
 from tkinter import ttk
-from trainer import Trainer
+from core.trainer import Trainer
 import numpy as np
-from neuralNet import NeuralNet
-from dataset import train_dataset,test_dataset
+from core.neuralNet import NeuralNet
+from core.dataset import train_dataset,test_dataset
 
 class TrainingTweaker:
     # def __init__(self,window:tk.Tk,app:App): # future not working

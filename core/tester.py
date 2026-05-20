@@ -1,5 +1,5 @@
-from neuralNet import NeuralNet
-from dataset import DataSet
+from core.neuralNet import NeuralNet
+from core.dataset import DataSet
 import matplotlib.pyplot as plt
 import numpy as np
 class Tester:

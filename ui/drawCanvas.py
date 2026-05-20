@@ -3,7 +3,7 @@ from tkinter import ttk
 from PIL import Image,ImageDraw,ImageTk
 import numpy as np
 import matplotlib.pyplot as plt
-from neuralNet import NeuralNet
+from core.neuralNet import NeuralNet
 class Draw_Canvas:
     def __init__(self,window: tk.Tk,pred_model:NeuralNet):
         self.window=window
