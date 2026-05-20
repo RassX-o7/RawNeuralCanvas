@@ -11,14 +11,6 @@ import threading
 from app import App
 from dataset import DataSet
 
-#add kill functionality 
-#if app killed , everything else
-class ComapreModels():
-    ...
-class EvaluateModel():
-    #implement visualizer index , type of evaluation? want confusion matrix etc
-    #but evaluation mean everything
-    ...
 def main():
     train_dataset = DataSet(mode="train")
     test_dataset = DataSet(mode="test")
