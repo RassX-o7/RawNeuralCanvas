@@ -36,6 +36,7 @@ Draw a digit on the canvas and let the trained neural network predict it.
 
 **Planned**
 - Integration of multiple activation functions (ReLU, Softmax) and weight initializations
+- Doodle canvas n dataset
 - Different Cost functions such as cross-entropy
 - Adam optimizer, variable learning rate
 - Auto - encoders
