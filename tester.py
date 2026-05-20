@@ -3,7 +3,7 @@ from dataset import DataSet
 import matplotlib.pyplot as plt
 import numpy as np
 class Tester:
-    def __init__(self,NeuralNet:NeuralNet,test_dataset: DataSet,test_size=10000,visualizer=False) : # IF evail is False means compare is true , eval true means just ideal and true comapre
+    def __init__(self,NeuralNet:NeuralNet,test_dataset: DataSet,test_size=10000,visualizer=False,test_aug=False) : # IF evail is False means compare is true , eval true means just ideal and true comapre
         self.NN=NeuralNet
         self.testSet=test_dataset
         self.test_size=test_size

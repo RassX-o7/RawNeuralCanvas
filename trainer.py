@@ -3,9 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 import os
+from dataset import DataSet
 
 class Trainer:
-    def __init__(self,NeuralNet:NeuralNet,train_dataset,epochs=10,dataset=60000,mode="SGD",Visulaizer=False,save=False,save_loc="trainedModel/",batch_size=1,hyperparam=0.05,augment=False,per_update=500):
+    def __init__(self,NeuralNet:NeuralNet,train_dataset:DataSet,epochs=10,dataset=60000,mode="SGD",Visulaizer=False,save=False,save_loc="trainedModel/",batch_size=1,hyperparam=0.05,augment=False,per_update=500):
         self.NN=NeuralNet
         self.dataset=train_dataset
         self.hyperparam=hyperparam
@@ -82,7 +83,11 @@ class Trainer:
             os.makedirs(self.save_loc,exist_ok=True) 
             lys=str(self.NN.layer_sizes)
             print(lys)
-            lys=lys[5:-5]
+            # lys=lys[5:-5]
+            lys=""
+            # lys+=[str(sz) for sz in self.NN.layer_sizes]
+            for sz in self.NN.layer_sizes[1:-1]:
+                lys+=str(sz)
             file_path=self.save_loc+"NNmodel_"+f"e{self.epochs}d{self.dataset_size}n{lys}"+".npz"
             save_dict={}
             for layer,array in enumerate(weights):

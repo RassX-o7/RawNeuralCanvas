@@ -47,11 +47,38 @@ class App:
         self.model_trained=False
         self.train_warn_label=ttk.Label(self.window,text="\nPlease Train a New Model OR Load Pre-Trained Model") 
     def compare_models(self):
-        pass
+        try:
+            filepath1 = filedialog.askopenfilename(title="Select Model 1",filetypes=[("numpy_files)", "*.npz")])
+            print("loaded MODEL 1")
+
+            data_zip1=np.load(filepath1)
+            layers1=len(data_zip1)//2
+            weights_list_1=[data_zip1[f"w_{layer}"] for layer in range(layers1)]
+            biases_list_1=[data_zip1[f"b_{layer}"] for layer in range(layers1)]
+            self.comp_1=NeuralNet(weights_list_1,biases_list_1)
+
+            filepath2 = filedialog.askopenfilename(title="Select Model 2",filetypes=[("numpy_files)", "*.npz")])
+            print("loaded MODEL 2")
+
+            data_zip2=np.load(filepath2)
+            layers2=len(data_zip2)//2
+            weights_list_2=[data_zip2[f"w_{layer}"] for layer in range(layers2)]
+            biases_list_2=[data_zip2[f"b_{layer}"] for layer in range(layers2)]
+            self.comp_2=NeuralNet(weights_list_2,biases_list_2)
+            tester1=Tester(self.comp_1,test_dataset)
+            tester1.testing()
+            print(tester1.cm_true)
+            tester2=Tester(self.comp_2,test_dataset)
+            tester2.testing()
+            compareModel=Compare(tester1,tester2,eval=False)
+            compareModel.compare()
+        except:
+            print("error in opening file , please recheck and try again")
+            return
     def eval_model(self):
         if self.model_trained:
             self.train_warn_label.pack_forget()
-            tester1=Tester(self.model,self.dataset)
+            tester1=Tester(self.model,test_dataset)
             tester1.testing()
             compare_ideal=Compare(tester1,tester1,eval=True)
             compare_ideal.compare()
