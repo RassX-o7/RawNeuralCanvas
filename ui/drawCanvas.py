@@ -70,7 +70,7 @@ class Draw_Canvas:
             self.pred_var.set(value=f"---- The Model {var} its a {prediction} !! ----")
             print(f"Prediction : {prediction} , Confidence : {confidence*100}")
     def viewImg(self):
-        if not self.small_img :
+        if self.small_img is None:
             self.compileWarning.pack()
             self.compiled_check.set("Please Compile the Image First")
         else:
@@ -81,8 +81,9 @@ class Draw_Canvas:
         self.canvas.delete("all")
         self.small_img=None
     def draw(self,arg):
-        brush_size=26
+        brush_size=18
+        brush_sizeX=22
         x=arg.x
         y=arg.y
-        self.canvas.create_oval(x-brush_size//2,y-brush_size//2,x+brush_size//2,y+brush_size//2,outline="white",fill="white")
+        self.canvas.create_oval(x-brush_sizeX//2,y-brush_sizeX//2,x+brush_sizeX//2,y+brush_sizeX//2,outline="white",fill="white")
         self.draw_img.ellipse([x-brush_size//2, y-brush_size//2, x+brush_size//2, y+brush_size//2],fill="white")
