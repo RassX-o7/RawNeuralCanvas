@@ -42,3 +42,29 @@ class Compare:
                 else:
                     axs[1].text(j,i,self.tester1.cm_ideal[i][j],color="white",ha="center",va="center")
         plt.show()
+        
+        if self.eval:
+            model=self.tester1.NN
+            fig, axes=plt.subplots(1,2,figsize=(14,6))
+            flattend_weights_init=[]
+            flattend_weights_final=[]
+            # fig, axes=plt.subplots()
+            
+            axes[0].set_title("Initial Untraind Weights distribution ")
+            axes[1].set_title("Trained Model  Weights distribution Histogram")
+            # for weights_arr in model.init_weights:
+            #     weights_arr = weights_arr.flatten() 
+            # for layer in range(len(model.init_weights)):
+                # model.init_weights[layer]=model.init_weights[layer].flatten()
+            for layer in range(len(model.init_weights)):
+                flattend_weights_init.append(model.init_weights[layer].flatten())
+                flattend_weights_final.append(model.weights_list[layer].flatten())
+
+            single_array_init=np.concatenate(flattend_weights_init)
+            single_array_final=np.concatenate(flattend_weights_final)
+            axes[0].hist(single_array_init,bins=20,range=(-1,1))
+            axes[1].hist(single_array_final,bins=20,range=(-2,2))
+            plt.show()
+
+
+

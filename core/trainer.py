@@ -82,9 +82,9 @@ class Trainer:
         if self.save_wb:
             weights=self.NN.weights_list
             biases=self.NN.biases_list
+            weights_init=self.NN.init_weights
             os.makedirs(self.save_loc,exist_ok=True) 
             lys=str(self.NN.layer_sizes)
-            print(lys)
             # lys=lys[5:-5]
             lys=""
             # lys+=[str(sz) for sz in self.NN.layer_sizes]
@@ -96,4 +96,6 @@ class Trainer:
                 save_dict[f"w_{layer}"]=array
             for layer,array in enumerate(biases):
                 save_dict[f"b_{layer}"]=array
+            for layer,array in enumerate(weights_init):
+                save_dict[f"w_i_{layer}"]=array
             np.savez(file=file_path,**save_dict)

@@ -92,11 +92,14 @@ class App:
     def load_weights_biases(self):
         filepath = filedialog.askopenfilename(title="Open numpy files",filetypes=[("numpy_files)", "*.npz")])
         data_zip=np.load(filepath)
-        layers=len(data_zip)//2
+        layers=len(data_zip)//3
         weights_list=[data_zip[f"w_{layer}"] for layer in range(layers)]
         biases_list=[data_zip[f"b_{layer}"] for layer in range(layers)]
+        weights_init=[data_zip[f"w_i_{layer}"] for layer in range(layers)]
         self.model=NeuralNet(weights_list,biases_list)
+        self.model.init_weights=weights_init
         self.model_trained=True
+        self.train_warn_label.pack_forget()
     def load_untrained(self):
         #LOAD random each time
         DigitRandomNN=NeuralNet(weights=[np.random.randn(y,x)*np.sqrt(1/x) for x,y in zip([784,16,16],[16,16,10])],biases=[np.zeros((y,1)) for y in [16,16,10]])
@@ -132,7 +135,9 @@ class App:
 base=os.path.dirname(os.path.abspath(__file__))
 base_root=os.path.dirname(base)
 data_zip_in_built=np.load(os.path.join(base_root,"trainedModel","NNmodel_light2_16.npz"))
-layers=len(data_zip_in_built)//2
+layers=len(data_zip_in_built)//3
 weights_inbuilt=[data_zip_in_built[f"w_{layer}"] for layer in range(layers)]
 bias_inbuilt=[data_zip_in_built[f"b_{layer}"] for layer in range(layers)]
+weights_init_inbuilt=[data_zip_in_built[f"w_i_{layer}"] for layer in range(layers)]
 DigitNN=NeuralNet(weights_inbuilt,bias_inbuilt)
+DigitNN.init_weights=weights_inbuilt

@@ -1,9 +1,11 @@
 import numpy as np
+from copy import deepcopy
 
 class NeuralNet:
     def __init__(self,weights,biases):
-        self.weights_list=weights
-        self.biases_list=biases
+        self.init_weights=deepcopy(weights)
+        self.weights_list=deepcopy(weights)
+        self.biases_list=deepcopy(biases)
         layer_sizesx=[list(layer.shape)[1] for layer in self.weights_list]+[(self.weights_list[-1].shape)[0]]
         self.num_layers=len(layer_sizesx)
         self.layer_sizes=layer_sizesx
