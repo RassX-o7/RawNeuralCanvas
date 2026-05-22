@@ -52,7 +52,7 @@ class App:
             print("loaded MODEL 1")
 
             data_zip1=np.load(filepath1)
-            layers1=len(data_zip1)//2
+            layers1=len(data_zip1)//3
             weights_list_1=[data_zip1[f"w_{layer}"] for layer in range(layers1)]
             biases_list_1=[data_zip1[f"b_{layer}"] for layer in range(layers1)]
             self.comp_1=NeuralNet(weights_list_1,biases_list_1)
@@ -61,7 +61,7 @@ class App:
             print("loaded MODEL 2")
 
             data_zip2=np.load(filepath2)
-            layers2=len(data_zip2)//2
+            layers2=len(data_zip2)//3
             weights_list_2=[data_zip2[f"w_{layer}"] for layer in range(layers2)]
             biases_list_2=[data_zip2[f"b_{layer}"] for layer in range(layers2)]
             self.comp_2=NeuralNet(weights_list_2,biases_list_2)
