@@ -71,14 +71,15 @@ class Trainer:
             axes[0].set_xlabel("Number of Batch Iterations")
             axes[0].set_ylabel("Cost")
             axes[0].set_title("Cost vs epochs")
-            N=self.dataset_size//self.update_cost
-            axes[0].set_xlim(0,self.epochs*N)
+            Nc=self.dataset_size//self.update_cost
+            axes[0].set_xlim(0,self.epochs*Nc)
             axes[0].set_ylim(bottom=0,top=3)
             linex_vis,=axes[0].plot(range(len(self.cost_history)),self.cost_history)
             linex_valid,=axes[1].plot(range(len(self.cost_history)),self.acc_history)
             tester=Tester(self.NN,validation_dataset)
-            # N=1000//self.update_
-            axes[1].set_xlim(0,2000)
+            # Nv=1000//self.update_validation
+            Nv=self.dataset_size//self.update_validation
+            axes[1].set_xlim(0,self.epochs*Nv)
             axes[1].set_xlabel("Number of Batch Iterations")
             axes[1].set_ylabel("Accuracy % ")
             axes[1].set_title("Validation set accuracy while training")
