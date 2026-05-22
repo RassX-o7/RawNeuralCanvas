@@ -8,7 +8,7 @@ class DataSet:
         if self.mode == "train":
             image_path=os.path.join(base_root,"dataset/train-images.idx3-ubyte")
             label_path=os.path.join(base_root,"dataset/train-labels.idx1-ubyte")
-        elif self.mode == "test":
+        elif self.mode == "test" or self.mode == "valid":
             image_path=os.path.join(base_root,"dataset/t10k-images.idx3-ubyte")
             label_path=os.path.join(base_root,"dataset/t10k-labels.idx1-ubyte")
         with open(image_path,"rb") as images_file:
@@ -20,6 +20,10 @@ class DataSet:
             labels=np.frombuffer(labels_file.read(),dtype=np.uint8) 
         self.dataset_images=images
         self.dataset_labels=labels
+        if self.mode=="valid":
+            self.dataset_images=images[-1000:]
+            self.dataset_labels=labels[-1000:]
+        self.dataset_size=len(self.dataset_labels)
     @staticmethod
     def _augment_og(image:np.ndarray):
         angle=np.random.uniform(-15,15)
@@ -61,3 +65,4 @@ base_root=os.path.dirname(base) # dirname rips the last thing from path , i.e re
 
 train_dataset=DataSet(mode="train")
 test_dataset=DataSet(mode="test")
+validation_dataset=DataSet(mode="valid")
