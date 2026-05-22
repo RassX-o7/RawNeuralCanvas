@@ -5,7 +5,7 @@ from core.trainer import Trainer
 import numpy as np
 from core.neuralNet import NeuralNet
 from core.dataset import train_dataset,test_dataset
-
+#fix MBG error and 80k
 class TrainingTweaker:
     # def __init__(self,window:tk.Tk,app:App): # future not working
     def __init__(self,window:tk.Tk,app):
@@ -56,7 +56,7 @@ class TrainingTweaker:
         self.train_visual=tk.BooleanVar(value=False)
         self.valid_visual=tk.BooleanVar(value=True)
         self.label2x=ttk.Label(self.Frame2,text="Please tweak the Parameters of the Neural Network\n",font=8).pack()
-        ttk.Checkbutton(self.Frame2,text="Data Augmentation Recommended, Slower) ",variable=self.aug,onvalue=True,offvalue=False).pack() 
+        ttk.Checkbutton(self.Frame2,text="Data Augmentation (Recommended, Slower) ",variable=self.aug,onvalue=True,offvalue=False).pack() 
         ttk.Checkbutton(self.Frame2,text="Save Weights and Biases locally" ,onvalue=True,offvalue=False,variable=self.save_wb).pack() 
         ttk.Checkbutton(self.Frame2,text="Training Visualizer ( Heavy on System )" ,onvalue=True,offvalue=False,variable=self.train_visual).pack() 
         ttk.Checkbutton(self.Frame2,text="Validation set accuracy tracking ( Heavy )",onvalue=True,offvalue=False,variable=self.valid_visual).pack()
@@ -96,9 +96,9 @@ class TrainingTweaker:
             print("Invalid Entry for batch size consider pouring bleach on your eyes")
             return
         try:
-            assert int(self.dataset_var.get())>0
+            assert 60000>int(self.dataset_var.get())>0 # raises error
         except:
-            print("please enter positive integer value for dataset size")
+            print("please enter positive integer value for dataset size and itd be less than 60k")
             return
         try:
             assert 0.01<=float(self.hyper_param.get()) <=0.1
@@ -165,7 +165,7 @@ class TrainingTweaker:
         self.MBG_entry_label.pack()
         self.MBG_entry.pack()
         self.NXT_button.pack_forget()
-        ttk.Label(self.Frame1,text=" ").pack()
+        # ttk.Label(self.Frame1,text=" ").pack()
         self.NXT_button.pack()
     def FBG_tweak(self):
         self.DG_type.set(value="FGD")
