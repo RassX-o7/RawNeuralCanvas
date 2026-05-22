@@ -53,11 +53,13 @@ class TrainingTweaker:
         self.Frame2.pack_propagate(False)
         self.aug = tk.BooleanVar(value=True)
         self.save_wb = tk.BooleanVar(value=False)
-        self.visual=tk.BooleanVar(value=False)
+        self.train_visual=tk.BooleanVar(value=False)
+        self.valid_visual=tk.BooleanVar(value=True)
         self.label2x=ttk.Label(self.Frame2,text="Please tweak the Parameters of the Neural Network\n",font=8).pack()
         ttk.Checkbutton(self.Frame2,text="Data Augmentation Recommended, Slower) ",variable=self.aug,onvalue=True,offvalue=False).pack() 
         ttk.Checkbutton(self.Frame2,text="Save Weights and Biases locally" ,onvalue=True,offvalue=False,variable=self.save_wb).pack() 
-        ttk.Checkbutton(self.Frame2,text="Training Visualizer ( Heavy on System )" ,onvalue=True,offvalue=False,variable=self.visual).pack() 
+        ttk.Checkbutton(self.Frame2,text="Training Visualizer ( Heavy on System )" ,onvalue=True,offvalue=False,variable=self.train_visual).pack() 
+        ttk.Checkbutton(self.Frame2,text="Validation set accuracy tracking ( Heavy )",onvalue=True,offvalue=False,variable=self.valid_visual).pack()
         ttk.Label(self.Frame2,text=" ").pack()
         self.def_set=ttk.Button(self.Frame2,text="Set to default",command=self.Set_default)
         self.layers_num=tk.IntVar(value="1") 
@@ -142,7 +144,7 @@ class TrainingTweaker:
             weights=[np.random.randn(y,x)*np.sqrt(1/x) for x,y in zip(sizes[:-1],sizes[1:])]
             biases=[np.zeros((y,1)) for y in sizes[1:]]
             self.NN=NeuralNet(weights=weights,biases=biases)
-            trainer=Trainer(self.NN,train_dataset,epochs=self.epoch_var.get(),dataset=self.dataset_var.get(),save=self.save_wb.get(),Visulaizer=self.visual.get(),mode=self.DG_type.get(),batch_size=self.mbg_var.get(),hyperparam=self.hyper_param.get(),augment=self.aug.get())
+            trainer=Trainer(self.NN,train_dataset,epochs=self.epoch_var.get(),dataset=self.dataset_var.get(),save=self.save_wb.get(),Visulaizer=self.train_visual.get(),mode=self.DG_type.get(),batch_size=self.mbg_var.get(),hyperparam=self.hyper_param.get(),augment=self.aug.get(),validation=self.valid_visual.get())
             trainer.train()
             self.app.model=self.NN
             self.app.model_trained=True

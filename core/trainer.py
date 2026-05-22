@@ -1,4 +1,6 @@
-# from core.neuralNet import NeuralNet
+from core.neuralNet import NeuralNet
+from core.dataset import DataSet,validation_dataset
+from core.tester import Tester
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
@@ -8,7 +10,7 @@ base=os.path.dirname(os.path.abspath(__file__)) # abspath return the absolute pa
 base_root=os.path.dirname(base)
 save_loc=os.path.join(base_root,"trainedModel") # need to add \ otherwise, trainedModel gets added to name
 class Trainer:
-    def __init__(self,NeuralNet,train_dataset,epochs=10,dataset=60000,mode="SGD",Visulaizer=False,save=False,save_loc=save_loc+"\\",batch_size=1,hyperparam=0.05,augment=False,per_update=500):
+    def __init__(self,NeuralNet:NeuralNet,train_dataset:DataSet,epochs=10,dataset=60000,mode="SGD", Visulaizer=False, save=False, save_loc=save_loc+"\\", batch_size=1, hyperparam=0.05, augment=False, per_update_cost=500, validation=True, per_update_validation=1000):
         self.NN=NeuralNet
         self.dataset=train_dataset
         self.hyperparam=hyperparam
@@ -20,7 +22,9 @@ class Trainer:
         self.save_wb=save
         self.save_loc=save_loc
         self.augment=augment
-        self.update=per_update
+        self.update_cost=per_update_cost
+        self.update_validation=per_update_validation
+        self.validation=validation
     @staticmethod
     def _cost(activation_L,loss_matrix):
         return np.dot((activation_L - loss_matrix).T, (activation_L - loss_matrix)).item()
@@ -36,17 +40,50 @@ class Trainer:
         print(f"Mode = {self.mode}, save = {self.save_wb}, save_loc ={self.save_loc}")
         print(f"Batch_size = {self.batch_size}, hyperparam ={self.hyperparam}")
         print(f"augment = {self.augment}, layer_sizes ={self.NN.layer_sizes}")
-        if self.visualizer: 
+        if self.visualizer ^ self.validation: 
             plt.ion()
             fig,ax=plt.subplots()
             self.cost_history=[]
-            N=self.dataset_size//self.update
-            ax.set_xlabel("Number of Batch Iterations")
-            ax.set_ylabel("Cost")
-            ax.set_title("Cost vs epochs")
-            ax.set_xlim(0,self.epochs*N)
-            ax.set_ylim(bottom=0,top=3)
-            linex,=ax.plot(range(len(self.cost_history)),self.cost_history)
+            self.acc_history=[]
+            if self.visualizer : 
+                ax.set_xlabel("Number of Batch Iterations")
+                ax.set_ylabel("Cost")
+                ax.set_title("Cost vs epochs")
+                N=self.dataset_size//self.update_cost
+                ax.set_xlim(0,self.epochs*N)
+                ax.set_ylim(bottom=0,top=3)
+                linex_vis,=ax.plot(range(len(self.cost_history)),self.cost_history)
+            if self.validation :
+                linex_valid,=ax.plot(range(len(self.cost_history)),self.acc_history)
+                tester=Tester(self.NN,validation_dataset)
+                # N=1000//self.update_
+                ax.set_xlim(0,2000)
+                ax.set_xlabel("Number of Batch Iterations")
+                ax.set_ylabel("Accuracy % ")
+                ax.set_title("Validation set accuracy while training")
+                # ax.set_xlim(0,self.epochs*N)
+                ax.set_ylim(bottom=0,top=100)
+        elif self.visualizer and self.validation:
+            plt.ion()
+            fig,axes=plt.subplots(1,2,figsize=(12,6))
+            self.cost_history=[]
+            self.acc_history=[]
+            axes[0].set_xlabel("Number of Batch Iterations")
+            axes[0].set_ylabel("Cost")
+            axes[0].set_title("Cost vs epochs")
+            N=self.dataset_size//self.update_cost
+            axes[0].set_xlim(0,self.epochs*N)
+            axes[0].set_ylim(bottom=0,top=3)
+            linex_vis,=axes[0].plot(range(len(self.cost_history)),self.cost_history)
+            linex_valid,=axes[1].plot(range(len(self.cost_history)),self.acc_history)
+            tester=Tester(self.NN,validation_dataset)
+            # N=1000//self.update_
+            axes[1].set_xlim(0,2000)
+            axes[1].set_xlabel("Number of Batch Iterations")
+            axes[1].set_ylabel("Accuracy % ")
+            axes[1].set_title("Validation set accuracy while training")
+            # ax.set_xlim(0,self.epochs*N)
+            axes[1].set_ylim(bottom=0,top=100)
         for epoch in tqdm(range(self.epochs)):
             # print("\n") # uncheck for progress seperator
             running_sum=0
@@ -61,14 +98,22 @@ class Trainer:
                 self.NN.forward(train_image_data)
                 expected_outcome=Trainer._one_hot_encode(true_label)
                 cost=Trainer._cost(self.NN.model_activations[-1],loss_matrix=expected_outcome)
-                running_sum+=cost
-                if self.visualizer is True and idx%self.update == 0 and idx>0:
-                    avg = running_sum / self.update 
-                    self.cost_history.append(avg)
-                    linex.set_data(range(len(self.cost_history)), self.cost_history)
-                    running_sum = 0
-                    plt.pause(0.1)
-                acc_gradient_weights,acc_gradient_bias=self.NN.backward(expected_outcome,Mini_batch=False if self.mode == "SGD" else True,hyperparam=self.hyperparam) 
+                if self.visualizer:
+                    running_sum+=cost
+                    if idx%self.update_cost == 0 and idx>0 :
+                        avg = running_sum / self.update_cost 
+                        self.cost_history.append(avg)
+                        linex_vis.set_data(range(len(self.cost_history)), self.cost_history)
+                        running_sum = 0
+                        plt.pause(0.1)
+                if self.validation :
+                    if idx%self.update_validation == 0 and idx>0 :
+                        tester.testing()
+                        acc=tester.cm_true.trace()/10 #validation set size *100 
+                        self.acc_history.append(acc)
+                        linex_valid.set_data(range(len(self.acc_history)), self.acc_history) 
+                        plt.pause(0.1) # need this
+                acc_gradient_weights,acc_gradient_bias=self.NN.backward(expected_outcome, Mini_batch=False if self.mode == "SGD" else True, hyperparam=self.hyperparam) 
                 if self.mode != "SGD":
                     for index in range(self.NN.num_layers-1):
                         weights_sum[index]+=acc_gradient_weights[index]
