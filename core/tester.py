@@ -3,10 +3,10 @@ from core.dataset import DataSet
 import matplotlib.pyplot as plt
 import numpy as np
 class Tester:
-    def __init__(self,NeuralNet:NeuralNet,test_dataset: DataSet,test_size=10000,visualizer=False,test_aug=False) : # IF evail is False means compare is true , eval true means just ideal and true comapre
+    def __init__(self,NeuralNet:NeuralNet,test_dataset: DataSet,visualizer=False,test_aug=False) : # IF evail is False means compare is true , eval true means just ideal and true comapre
         self.NN=NeuralNet
         self.testSet=test_dataset
-        self.test_size=test_size
+        self.test_size= self.testSet.dataset_size
         self.visulaizer=visualizer
     def testing(self):
         correct=0
@@ -32,10 +32,10 @@ class Tester:
                 plt.show()
             if not prediction!=true_label:
                 correct+=1
-        print(self.true_labels)
-        print(self.pred_labels)
-        print(f"Out of {self.test_size} test samples , total {correct} were properly recognized ")
-        print(f"ACCURACY = {correct/self.test_size*100:.3f} %")
-        print("confusion matrix ",self.cm_true,end="\n")        
-if __name__=="main":
+        # print(self.true_labels)
+        # print(self.pred_labels)
+        # print(f"Out of {self.test_size} test samples , total {correct} were properly recognized ")
+        # print(f"ACCURACY = {correct/self.test_size*100:.3f} %")
+        # print("confusion matrix ",self.cm_true,end="\n")        
+if __name__=="__main__":
     ...
