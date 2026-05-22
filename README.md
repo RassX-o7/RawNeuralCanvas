@@ -17,6 +17,7 @@ Draw a digit on the canvas and let the trained neural network predict it.
 - Model saving and loading using `.npz` 
 - Evaluation of model using its accuracy and confusion matrix 
 - Comparision of two models based on individual eval
+- Validation Set Tracking during training
 
 ## How to Run
 1. Clone the repo
@@ -30,9 +31,9 @@ Draw a digit on the canvas and let the trained neural network predict it.
 
 **Currently Implementing**
 - Threaded training so GUI stays responsive during training
-- Validation set tracking
 - kill functionality
 - exploring more evaluation methods
+- Softmax on output layer
 
 **Planned**
 - Integration of multiple activation functions (ReLU, Softmax) and weight initializations
