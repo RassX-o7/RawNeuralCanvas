@@ -25,6 +25,12 @@ class Trainer:
         self.update_cost=per_update_cost
         self.update_validation=per_update_validation
         self.validation=validation
+        if self.mode == "FGD" : self.batch_size = self.dataset_size
+    def show_attrs(self):
+        print("trainer_params as follows")
+        # print(vars(self)) prints dict like
+        for tuple in vars(self).items():
+            print(f"{tuple[0]} - {tuple[1]}")
     @staticmethod
     def _cost(activation_L,loss_matrix):
         return np.dot((activation_L - loss_matrix).T, (activation_L - loss_matrix)).item()
@@ -34,12 +40,12 @@ class Trainer:
         expected[true_label]=1
         return expected
     def train(self):
-        if self.mode == "FGD" : self.batch_size = self.dataset_size
-        print("Initalizing training sequence , the following params are received : ")
-        print(f"Viusualizer = {self.visualizer}, dataset_size = {self.dataset_size} ,epochs ={self.epochs}")
-        print(f"Mode = {self.mode}, save = {self.save_wb}, save_loc ={self.save_loc}")
-        print(f"Batch_size = {self.batch_size}, hyperparam ={self.hyperparam}")
-        print(f"augment = {self.augment}, layer_sizes ={self.NN.layer_sizes}")
+        # print("Initalizing training sequence , the following params are received : ")
+        # print(f"Viusualizer = {self.visualizer}, dataset_size = {self.dataset_size} ,epochs ={self.epochs}")
+        # print(f"Mode = {self.mode}, save = {self.save_wb}, save_loc ={self.save_loc}")
+        # print(f"Batch_size = {self.batch_size}, hyperparam ={self.hyperparam}")
+        # print(f"augment = {self.augment}, layer_sizes ={self.NN.layer_sizes}")
+        mini_batch = False if self.mode == "SGD" else True
         if self.visualizer ^ self.validation: 
             plt.ion()
             fig,ax=plt.subplots()
@@ -57,7 +63,10 @@ class Trainer:
                 linex_valid,=ax.plot(range(len(self.cost_history)),self.acc_history)
                 tester=Tester(self.NN,validation_dataset)
                 # N=1000//self.update_
-                ax.set_xlim(0,2000)
+                Nv=self.dataset_size//self.update_validation
+                if mini_batch:
+                    self.dataset_size
+                ax.set_xlim(0,self.epochs*Nv)
                 ax.set_xlabel("Number of Batch Iterations")
                 ax.set_ylabel("Accuracy % ")
                 ax.set_title("Validation set accuracy while training")
@@ -91,7 +100,7 @@ class Trainer:
             weights_sum=[np.zeros((y,x)) for x,y in zip(self.NN.layer_sizes[:-1],self.NN.layer_sizes[1:])]
             biases_sum=[np.zeros((y,1)) for y in self.NN.layer_sizes[1:]]
             randm=np.random.permutation(self.dataset_size)
-            iterations__times_effective=self.dataset_size//self.batch_size
+            # iterations__times_effective=self.dataset_size//self.batch_size
             iterations_residue=self.dataset_size%self.batch_size
             for idx,iteration in enumerate(randm[:self.dataset_size-iterations_residue]):
                 train_image_data,true_label=self.dataset.get(iteration,self.augment)
@@ -114,12 +123,14 @@ class Trainer:
                         self.acc_history.append(acc)
                         linex_valid.set_data(range(len(self.acc_history)), self.acc_history) 
                         plt.pause(0.1) # need this
-                acc_gradient_weights,acc_gradient_bias=self.NN.backward(expected_outcome, Mini_batch=False if self.mode == "SGD" else True, hyperparam=self.hyperparam) 
-                if self.mode != "SGD":
+                acc_gradient_weights,acc_gradient_bias=self.NN.backward(expected_outcome, Mini_batch = mini_batch, hyperparam=self.hyperparam) 
+                if mini_batch:
                     for index in range(self.NN.num_layers-1):
                         weights_sum[index]+=acc_gradient_weights[index]
                         biases_sum[index]+=acc_gradient_bias[index]
-                if (idx+1)%self.batch_size==0 and self.mode!="SGD":
+                if (idx+1)%self.batch_size==0 and mini_batch:
+                    # print("updation in mini_batch")
+                    # print("batch_size -",self.batch_size)
                     for index in range(self.NN.num_layers-1):
                         self.NN.weights_list[index]-=(self.hyperparam*weights_sum[index])/self.batch_size
                         self.NN.biases_list[index]-=(self.hyperparam*biases_sum[index])/self.batch_size
@@ -130,7 +141,7 @@ class Trainer:
             biases=self.NN.biases_list
             weights_init=self.NN.init_weights
             os.makedirs(self.save_loc,exist_ok=True) 
-            lys=str(self.NN.layer_sizes)
+            # lys=str(self.NN.layer_sizes) #brackets not rendered in filename
             # lys=lys[5:-5]
             lys=""
             # lys+=[str(sz) for sz in self.NN.layer_sizes]

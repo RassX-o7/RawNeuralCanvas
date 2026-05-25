@@ -1,13 +1,4 @@
-import numpy as np
-from tqdm import tqdm
-import time,random
-import matplotlib.pyplot as plt
 import tkinter as tk
-from tkinter import ttk
-from PIL import Image,ImageDraw,ImageTk
-from tkinter import filedialog
-import os
-import threading
 from ui.app import App
 from core.dataset import DataSet
 
@@ -21,6 +12,6 @@ def main():
     AppX = App(window1,train_dataset)
 
     window1.mainloop()
-print(__name__)
+
 if __name__=="__main__":
     main()

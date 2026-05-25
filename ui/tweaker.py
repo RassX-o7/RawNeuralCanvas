@@ -16,9 +16,9 @@ class TrainingTweaker:
         self.epoch_var=tk.IntVar(value=1)
         self.mbg_var=tk.IntVar(value=1)
         self.dataset_var=tk.IntVar(value=1)
-        self.defualt_DG=tk.IntVar(value=2) 
+        self.defualt_DG=tk.IntVar(value=0) 
         self.hyper_param=tk.DoubleVar(value=0.05)
-        self.DG_type=tk.StringVar(value="SGD")
+        self.DG_type=tk.StringVar(value="SGD") # BUG fixed, radio set to FGD first BUT actual param string set to SGD , later set to default SDG cuz without momentum , sdg and small batches are effective
         self.Frame1=ttk.Frame(self.window,width=self.window.winfo_width(),height=self.window.winfo_height())
         self.Frame1.pack_propagate(False)
         ttk.Label(self.Frame1,text="This is the interface to train your model and set parameters as per your convenience\n",font=8).pack()
@@ -30,11 +30,17 @@ class TrainingTweaker:
         self.rd1=ttk.Radiobutton(self.Frame1,text="Stochastic Descent Approach",command=self.SGD_tweak,value=0,variable=self.defualt_DG) 
         self.rd2=ttk.Radiobutton(self.Frame1,text="Mini Batch Descent",command=self.MGD_tweak,value=1,variable=self.defualt_DG)
         self.rd3=ttk.Radiobutton(self.Frame1,text="Full Batch Descent",command=self.FBG_tweak,value=2,variable=self.defualt_DG)
-        self.MBG_slider= ttk.Scale(self.Frame1,from_=1,variable=self.mbg_var, to=6000, orient="horizontal",command= lambda val: self.mbg_var.set(int(float(val))),length=500)
+        self.MBG_slider= ttk.Scale(self.Frame1,from_=1,variable=self.mbg_var, to=1024, orient="horizontal",command= lambda val: self.mbg_var.set(int(float(val))),length=500)
         self.MBG_label=ttk.Label(self.Frame1,text="Set the Batch Size")
-        self.MBG_entry_label=ttk.Label(self.Frame1,text="OR enter manually ,Max6k")
+        self.MBG_entry_label=ttk.Label(self.Frame1,text="OR enter manually ,Max 1024")
         self.MBG_entry=tk.Entry(self.Frame1,textvariable=self.mbg_var,width=5)
+        self.out_mode=tk.StringVar(value="sigmoid")
+        self.output_func=ttk.Label(self.Frame1,text="Select The Output layer activation Function : ")
+        self.output_func_1=ttk.Radiobutton(self.Frame1,text="Sigmoid",variable=self.out_mode,value="sigmoid")
+        self.output_func_2=ttk.Radiobutton(self.Frame1,text="SoftMax",variable=self.out_mode,value="softmax")
         self.NXT_button=ttk.Button(self.Frame1,text="NEXT",command=self.next_page)
+        self.sequential=tk.BooleanVar(value=False)
+        self.sequential_fwd=ttk.Checkbutton(self.Frame1,text="Custom Forward Sequental (advanced)",variable=self.sequential)
         self.epoch_slider.pack()
         self.epoch_label.pack()
         ttk.Label(self.Frame1,text="set the length of train dataset").pack()
@@ -45,9 +51,14 @@ class TrainingTweaker:
         self.rd2.pack()
         self.rd3.pack()
         ttk.Label(self.Frame1,text=" ").pack()
-        ttk.Label(self.Frame1,text="Enter the value for Learning Rate , typical value bw 0.01 to 0.1").pack()
+        ttk.Label(self.Frame1,text="Enter the value for Learning Rate , typical value bw 0.01 to 0.2").pack()
         tk.Entry(self.Frame1,textvariable=self.hyper_param,width=5).pack()
         ttk.Label(self.Frame1,text= " ").pack()
+        self.output_func.pack()
+        self.output_func_1.pack()
+        self.output_func_2.pack()
+        # self.sequential_fwd.pack()
+        ttk.Label(self.Frame1,text=" ").pack()
         self.NXT_button.pack()
         self.Frame2=ttk.Frame(self.window,width=self.window.winfo_width(),height=self.window.winfo_height())
         self.Frame2.pack_propagate(False)
@@ -89,8 +100,8 @@ class TrainingTweaker:
         self.Frame1.pack()
     def next_page(self):
         try:
-            if int(self.mbg_var.get())<=0:
-                print("please enter positive integer value for batch size")
+            if not 1025>int(self.mbg_var.get())>=0:
+                print("please enter in range value")
                 return 
         except:
             print("Invalid Entry for batch size consider pouring bleach on your eyes")
@@ -101,7 +112,7 @@ class TrainingTweaker:
             print("please enter positive integer value for dataset size and itd be less than 60k")
             return
         try:
-            assert 0.01<=float(self.hyper_param.get()) <=0.1
+            assert 0.01<=float(self.hyper_param.get()) <=0.2
         except:
             print("please enter appropriate float value")
             return
@@ -143,8 +154,10 @@ class TrainingTweaker:
             sizes=[784]+self.all_neurons+[10]
             weights=[np.random.randn(y,x)*np.sqrt(1/x) for x,y in zip(sizes[:-1],sizes[1:])]
             biases=[np.zeros((y,1)) for y in sizes[1:]]
-            self.NN=NeuralNet(weights=weights,biases=biases)
+            self.NN=NeuralNet(weights=weights,biases=biases,out_mode=self.out_mode.get())
+            self.NN.show_attrs()
             trainer=Trainer(self.NN,train_dataset,epochs=self.epoch_var.get(),dataset=self.dataset_var.get(),save=self.save_wb.get(),Visulaizer=self.train_visual.get(),mode=self.DG_type.get(),batch_size=self.mbg_var.get(),hyperparam=self.hyper_param.get(),augment=self.aug.get(),validation=self.valid_visual.get())
+            trainer.show_attrs()
             trainer.train()
             self.app.model=self.NN
             self.app.model_trained=True
