@@ -155,4 +155,5 @@ class Trainer:
                 save_dict[f"b_{layer}"]=array
             for layer,array in enumerate(weights_init):
                 save_dict[f"w_i_{layer}"]=array
-            np.savez(file=file_path,**save_dict)
+            save_dict["output_param"] = np.array(self.NN.out_mode)
+            np.savez(file=file_path,**save_dict,temp="Loaded Model with params - ")

@@ -53,7 +53,7 @@ class Compare:
             axes[0].set_title("Initial Untraind Weights distribution ")
             axes[1].set_title("Trained Model  Weights distribution Histogram")
             # for weights_arr in model.init_weights:
-            #     weights_arr = weights_arr.flatten() 
+            #     weights_arr = weights_arr.flatten()
             # for layer in range(len(model.init_weights)):
                 # model.init_weights[layer]=model.init_weights[layer].flatten()
             for layer in range(len(model.init_weights)):
@@ -62,9 +62,22 @@ class Compare:
 
             single_array_init=np.concatenate(flattend_weights_init)
             single_array_final=np.concatenate(flattend_weights_final)
-            axes[0].hist(single_array_init,bins=20,range=(-1,1))
+            axes[0].hist(single_array_init,bins=20,range=(-2,2))
             axes[1].hist(single_array_final,bins=20,range=(-2,2))
             plt.show()
 
+            layers = model.num_layers -2 # hidden
+            fig, axes=plt.subplots(2 ,layers ,figsize=(14,7)) # 1920x1080 
+            fig_bias,axes_b=plt.subplots(1,layers,figsize=(14,6)) # mention 1 cols ,otherwise treat as rows , now do one dimension idex if want 2d then squeeze param = false then [0][layer]
+            for layer in range(layers):
+                axes[0][layer].set_title(f"Hidden layer {layer+1}, post train weights")
+                axes[1][layer].set_title(f"Hidden layer {layer+1}, untrained weights")
+                flattend_weights_init_layer = model.init_weights[layer].flatten()
+                flattend_weights_final_layer = model.weights_list[layer].flatten()
+                flattened_bias_layer = model.biases_list[layer].flatten()
+                axes[0][layer].hist(flattend_weights_final_layer,bins=20,range=(-2,2))
+                axes[1][layer].hist(flattend_weights_init_layer,bins=20,range=(-2,2))
+                axes_b[layer].set_title(f"Hidden layer {layer+1}, post train bias")
+                axes_b[layer].hist(flattened_bias_layer,bins=20,range=(-2,2))
 
-
+            plt.show()
