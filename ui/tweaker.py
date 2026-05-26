@@ -51,7 +51,7 @@ class TrainingTweaker:
         self.rd2.pack()
         self.rd3.pack()
         ttk.Label(self.Frame1,text=" ").pack()
-        ttk.Label(self.Frame1,text="Enter the value for Learning Rate , typical value bw 0.01 to 0.2").pack()
+        ttk.Label(self.Frame1,text="Enter the value for Learning Rate , typical value bw 0.01 to 1").pack()
         tk.Entry(self.Frame1,textvariable=self.hyper_param,width=5).pack()
         ttk.Label(self.Frame1,text= " ").pack()
         self.output_func.pack()
@@ -112,7 +112,7 @@ class TrainingTweaker:
             print("please enter positive integer value for dataset size and itd be less than 60k")
             return
         try:
-            assert 0.01<=float(self.hyper_param.get()) <=0.2
+            assert 0.01<=float(self.hyper_param.get()) <=1
         except:
             print("please enter appropriate float value")
             return

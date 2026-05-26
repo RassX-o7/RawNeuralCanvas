@@ -2,7 +2,7 @@ import numpy as np
 from copy import deepcopy
 
 class NeuralNet:
-    def __init__(self,weights,biases,out_mode="sigmoid"):
+    def __init__(self,weights,biases,out_mode="sigmoid",sequential=[]):
         self.init_weights=deepcopy(weights)
         self.weights_list=deepcopy(weights)
         self.biases_list=deepcopy(biases)
@@ -19,7 +19,7 @@ class NeuralNet:
         #may use this
         # def display_filtered_attributes(self):
         # # Filter out variables that are numpy arrays
-        # filtered = {k: v for k, v in vars(self).items() if not isinstance(v, np.ndarray)}
+        # filtered = {k: v for k, v in vars(self).items() if not isinstance(v, np.ndarray)} # dict comprehension key : value
         # print(filtered)
     def show_attrs(self):
         print("model_params initalized to ")
@@ -75,7 +75,7 @@ class NeuralNet:
                 self.model_activations[layer+1]=NeuralNet._softmax(NeuralNet._weightedSum(self.weights_list[layer],self.model_activations[layer],self.biases_list[layer]))
             else:
                 self.model_activations[layer+1]=NeuralNet._sigmoid(NeuralNet._weightedSum(self.weights_list[layer],self.model_activations[layer],self.biases_list[layer]))
-    def backward(self,expected_outcome,hyperparam=0.05,Mini_batch=False):
+    def backward(self,expected_outcome,hyperparam=0.05): # hyperparam is need as param , not attribute cuz optimizer will make it dynamic i.e depend of each pass
         # print(Mini_batch)
         if self.out_mode=="sigmoid":
             # print("using sigmoid")
@@ -90,9 +90,4 @@ class NeuralNet:
         for index in range(self.num_layers-1):
             gradient_weights.append(NeuralNet._delC__delW_x(delta_x_1=self.delta_list[index],activation_x=self.model_activations[index]))
             gradient_bias.append(NeuralNet._delC__delB_x(delta_x=self.delta_list[index]))
-        if Mini_batch:
-            return gradient_weights,gradient_bias
-        for index in range(self.num_layers-1):
-            self.weights_list[index]-=hyperparam*gradient_weights[index]
-            self.biases_list[index]-=hyperparam*gradient_bias[index]
-        return 0,0
+        return gradient_weights,gradient_bias
