@@ -75,7 +75,7 @@ class NeuralNet:
                 self.model_activations[layer+1]=NeuralNet._softmax(NeuralNet._weightedSum(self.weights_list[layer],self.model_activations[layer],self.biases_list[layer]))
             else:
                 self.model_activations[layer+1]=NeuralNet._sigmoid(NeuralNet._weightedSum(self.weights_list[layer],self.model_activations[layer],self.biases_list[layer]))
-    def backward(self,expected_outcome,hyperparam=0.05): # hyperparam is need as param , not attribute cuz optimizer will make it dynamic i.e depend of each pass
+    def backward(self,expected_outcome): # hyperparam is need as param , not attribute cuz optimizer will make it dynamic i.e depend of each pass , update , nn should only return gradients at that instant , its trainer job to do whatever
         # print(Mini_batch)
         if self.out_mode=="sigmoid":
             # print("using sigmoid")

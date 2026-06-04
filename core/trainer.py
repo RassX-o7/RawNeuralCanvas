@@ -120,20 +120,20 @@ class Trainer:
                         self.acc_history.append(acc)
                         linex_valid.set_data(range(len(self.acc_history)), self.acc_history) 
                         plt.pause(0.1) # need this
-                acc_gradient_weights,acc_gradient_bias=self.NN.backward(expected_outcome, hyperparam=self.hyperparam) 
+                acc_gradient_weights,acc_gradient_bias=self.NN.backward(expected_outcome) 
                 for index in range(self.NN.num_layers-1): # no need to optimize for ==1 so direct update with acc_gradients , that copy is neg.
                     weights_sum[index]+=acc_gradient_weights[index]
                     biases_sum[index]+=acc_gradient_bias[index]
                 if (idx+1)%self.batch_size==0:
-                    print("updation in mini_batch")
-                    print(np.linalg.norm(weights_sum[0] / self.batch_size))
-                    print(np.linalg.norm(weights_sum[1] / self.batch_size))
-                    print(np.linalg.norm(weights_sum[0] ))
-                    print(np.linalg.norm(weights_sum[1] ))
-                    print("batch_size -",self.batch_size)
+                    # print("updation in mini_batch")
+                    # print(np.linalg.norm(weights_sum[0] / self.batch_size))
+                    # print(np.linalg.norm(weights_sum[1] / self.batch_size))
+                    # print(np.linalg.norm(weights_sum[0] ))
+                    # print(np.linalg.norm(weights_sum[1] ))
+                    # print("batch_size -",self.batch_size)
                     for index in range(self.NN.num_layers-1):
-                        self.NN.weights_list[index]-=(self.hyperparam*weights_sum[index])/self.batch_size
-                        self.NN.biases_list[index]-=(self.hyperparam*biases_sum[index])/self.batch_size
+                        self.NN.weights_list[index]-=(self.hyperparam*(self.batch_size**0.5)*weights_sum[index])/self.batch_size
+                        self.NN.biases_list[index]-=(self.hyperparam*(self.batch_size**0.5)*biases_sum[index])/self.batch_size
                         weights_sum[index].fill(0) # REUSE dont REALLOCATE
                         biases_sum[index].fill(0)
                     # weights_sum=[np.zeros((y,x)) for x,y in zip(self.NN.layer_sizes[:-1],self.NN.layer_sizes[1:])]
