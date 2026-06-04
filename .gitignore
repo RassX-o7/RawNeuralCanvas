@@ -6,3 +6,5 @@ ui/__pycache__/
 temp.py
 #folder/ means whole folder , folder/* means all files in folder , "empty" folder is present, !just means not include in git ignore?
 #since git needs a file to recognize a folder , add dummy file .gitkeep , then ! so an empty folder can survive ( needed for future logs)
+ui/tweaker_insp.py
+ui/tweaker_og.py
