@@ -67,8 +67,9 @@ class Compare:
             plt.show()
 
             layers = model.num_layers -2 # hidden
-            fig, axes=plt.subplots(2 ,layers ,figsize=(14,7)) # 1920x1080 
-            fig_bias,axes_b=plt.subplots(1,layers,figsize=(14,6)) # mention 1 cols ,otherwise treat as rows , now do one dimension idex if want 2d then squeeze param = false then [0][layer]
+            fig, axes=plt.subplots(2 ,layers ,figsize=(14,7),squeeze=False) # 1920x1080 < width first
+            fig_bias,axes_b=plt.subplots(1,layers,figsize=(14,6),squeeze=False) # mention 1 cols ,otherwise treat as rows , now do one dimension idex if want 2d then squeeze param = false then [0][layer]
+            #SQUEEZE VERY VERY IMP , COVERS ALL CASES , see below
             for layer in range(layers):
                 axes[0][layer].set_title(f"Hidden layer {layer+1}, post train weights")
                 axes[1][layer].set_title(f"Hidden layer {layer+1}, untrained weights")
@@ -77,7 +78,11 @@ class Compare:
                 flattened_bias_layer = model.biases_list[layer].flatten()
                 axes[0][layer].hist(flattend_weights_final_layer,bins=20,range=(-2,2))
                 axes[1][layer].hist(flattend_weights_init_layer,bins=20,range=(-2,2))
-                axes_b[layer].set_title(f"Hidden layer {layer+1}, post train bias")
-                axes_b[layer].hist(flattened_bias_layer,bins=20,range=(-2,2))
-
+                axes_b[0][layer].set_title(f"Hidden layer {layer+1}, post train bias")
+                axes_b[0][layer].hist(flattened_bias_layer,bins=20,range=(-2,2))
             plt.show()
+            """NOTE : squeeze=true means to collapse to 1 array if possible ex subplots(1,3,figsize=) OR subplots(2,1,figsize=)
+            if squeeze is  true then normal indexing works for both ax[2] a[1] etc even for colmn (auto convert to 1d) , edge cases that now fixed-
+            1.suppose only 1 layer/hiden then for weights we get 2,1 subplot but since squeeze it now demands [0] [1] but we want to comare as it is 2,1 vertical so we do squeeze= false
+            2.same 1 hidden layer , bias was prev assumed zero init so only post bias , so 1,hidd_layers so we always assumed 1d array so normal indexing [x] BUT if hidd=1 then 1,1 with squeeze collapse and turns to just the object and NOT [object,]
+            so fixed by squeeze = false now 1,1 1,x always mean 2 array so address by [0][ax] for 1,1 to [0][0]""" 
