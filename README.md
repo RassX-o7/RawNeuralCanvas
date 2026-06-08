@@ -25,7 +25,7 @@ Draw a digit on the canvas and let the trained neural network predict it.
 3. python main.py
 
 ## Results
-~90% test accuracy on MNIST with [784, 16, 16, 10] architecture
+~94% test accuracy on MNIST with [784, 16, 16, 10] architecture
 
 ## Roadmap
 
@@ -34,11 +34,13 @@ Draw a digit on the canvas and let the trained neural network predict it.
 - kill functionality
 - exploring more evaluation methods
 - Softmax on output layer
+- ReLU as hidden activation function
 
 **Planned**
+- Model Eval, interactive confusion matrix
 - Integration of multiple activation functions (ReLU, Softmax) and weight initializations
-- Doodle canvas n dataset
 - Different Cost functions such as cross-entropy
+- Doodle canvas n dataset
 - Adam optimizer, variable learning rate
 - Auto - encoders
 - CNNs 
