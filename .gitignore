@@ -8,3 +8,4 @@ temp.py
 #since git needs a file to recognize a folder , add dummy file .gitkeep , then ! so an empty folder can survive ( needed for future logs)
 ui/tweaker_insp.py
 ui/tweaker_og.py
+resources/
