@@ -31,7 +31,7 @@ Draw a digit on the canvas and let the trained neural network predict it.
 
 **Currently Implementing**
 - Threaded training so GUI stays responsive during training
-- kill functionality
+- kill functionality ^, ui close > train stop 
 - exploring more evaluation methods
 - Softmax on output layer
 - ReLU as hidden activation function
@@ -39,6 +39,7 @@ Draw a digit on the canvas and let the trained neural network predict it.
 **Planned**
 - Model Eval, interactive confusion matrix
 - Integration of multiple activation functions (ReLU, Softmax) and weight initializations
+- Custom Sequential with individual fwd(), bkd(), various activation 
 - Different Cost functions such as cross-entropy
 - Doodle canvas n dataset
 - Adam optimizer, variable learning rate
