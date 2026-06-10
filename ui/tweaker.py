@@ -26,7 +26,7 @@ class TrainingTweaker:
         self.aug= tk.BooleanVar(value=True)
         self.save_wb= tk.BooleanVar(value=False)
         self.train_visual= tk.BooleanVar(value=False)
-        self.valid_visual= tk.BooleanVar(value=True)
+        self.valid_visual= tk.BooleanVar(value=False)
         self.layers_num = tk.IntVar(value=1)
         self.neuron_var =tk.StringVar()
         self.epoch_label_var = tk.StringVar(value="1")
@@ -93,6 +93,8 @@ class TrainingTweaker:
         ttk.Label(right, text="Bias Initialization:").grid(row=4, column=0, columnspan=2, sticky="w")
         ttk.Combobox(right,values=self.bias_init_types,textvariable=self.bias_init_var, state="readonly", width=24).grid( row=5,column=0, columnspan=2,sticky="ew")
         right.columnconfigure(0, weight=1)
+        self.shuffle=tk.BooleanVar(value=True)
+        ttk.Checkbutton(right, text="Training shuffler",variable=self.shuffle).grid(row=6, column=0,sticky="w",pady=(10,5))
 
         self.Frame1.columnconfigure(0, weight=1)
         self.Frame1.columnconfigure(1,weight=1)
@@ -105,7 +107,7 @@ class TrainingTweaker:
 
         opts = ttk.LabelFrame(self.Frame2, text="Options", padding=8)
         opts.grid(row=1, column=0, columnspan=4, sticky="ew", pady=4)
-        ttk.Checkbutton(opts, text="Data Augmentation (Recommended)", variable=self.aug).grid(row=0,column=0, sticky="w", padx=14, pady=2)
+        ttk.Checkbutton(opts, text="Data Augmentation (Recommended, Slower)", variable=self.aug).grid(row=0,column=0, sticky="w", padx=14, pady=2)
         ttk.Checkbutton(opts, text="Save Weights & Biases Locally",variable=self.save_wb).grid(row=0, column=1,sticky="w", padx=14,pady=2)
         ttk.Checkbutton(opts,text="Training Visualizer (Heavy)",variable=self.train_visual).grid(row=1, column=0, sticky="w", padx=14, pady=2)
         ttk.Checkbutton(opts, text="Validation Accuracy Tracking (Heavy)",variable=self.valid_visual).grid(row=1,column=1, sticky="w", padx=14, pady=2)
@@ -252,12 +254,15 @@ class TrainingTweaker:
 
         self.NN = NeuralNet(weights=weights, biases=biases,out_mode=self.out_mode.get())
         self.NN.show_attrs()
-        trainer = Trainer(self.NN, train_dataset,epochs=self.epoch_var.get(),dataset=self.dataset_var.get(),save=self.save_wb.get(),Visulaizer=self.train_visual.get(),mode=self.DG_type.get(),batch_size=self.mbg_var.get(),hyperparam=self.hyper_param.get(),augment=self.aug.get(),validation=self.valid_visual.get())
+        trainer = Trainer(self.NN, train_dataset,epochs=self.epoch_var.get(),dataset=self.dataset_var.get(),save=self.save_wb.get(),Visulaizer=self.train_visual.get(),mode=self.DG_type.get(),batch_size=self.mbg_var.get(),hyperparam=self.hyper_param.get(),augment=self.aug.get(),validation=self.valid_visual.get(),shuffle=self.shuffle.get())
         trainer.show_attrs()
         trainer.train()
         self.app.model = self.NN
         self.app.model_trained = True
-        status.grid_forget()
+        # status.grid_forget()
+        if status.winfo_exists():
+            status.grid_forget()
+        else:return
         ttk.Label(self.Frame2, text=" Model trained and loaded ✓ — you may close this window",foreground="green").grid(row=5, column=0, columnspan=4, pady=4)
 
     def SGD_tweak(self):
