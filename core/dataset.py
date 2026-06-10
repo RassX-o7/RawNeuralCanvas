@@ -1,6 +1,6 @@
 import os
 import numpy as np
-from PIL import Image,ImageDraw,ImageTk
+from PIL import Image
 
 class DataSet:
     def __init__(self,mode):
@@ -13,7 +13,8 @@ class DataSet:
             label_path=os.path.join(base_root,"dataset/t10k-labels.idx1-ubyte")
         with open(image_path,"rb") as images_file:
             header=images_file.read(16) 
-            images=np.frombuffer(images_file.read(),dtype=np.uint8)/255
+            images=np.frombuffer(images_file.read(),dtype=np.uint8)/np.float32(255)
+            #dividing by 255 upcasts into float64 so force the division by 32 , saves 2x memory , check resouce
             images=images.reshape(-1,28,28)
         with open(label_path,"rb") as labels_file:
             header=labels_file.read(8)
@@ -53,10 +54,29 @@ class DataSet:
             dst_x = slice(0, 28 + shift_x)
         shifted[dst_y, dst_x] = img[src_y, src_x]
         return shifted
-    def get(self,index,augment=False):
+    @staticmethod
+    def _augment_batch(batch_images): #imp revelation below
+        # augment_batch=np.zeros(np.shape(batch_images))
+        augment_batch=np.empty_like(batch_images) # stop initalizing with zero/.copy cuz OVERWRITE AT END, empty is yk , optimized
+        for idx,sample in enumerate(batch_images):
+            augment_batch[idx,:,:]=DataSet._augment(sample)
+        return augment_batch
+    """NOTE:
+    1. list[slice] returns a new independent list 
+    2. ndarray[slice] returns a view/direct pointer to the real object
+    3. understand diff bw reassignment and direct object change , first temp.py , check fx then listen to reass.mp3
+    4.both cases on list arr1 changes only to the sliced NEW list , not to the main list
+    NOTE :np advanced indexing returns copy """
+    
+    "NOTE: problem with og get() > listen to getFix.mp3"
+    def get_og(self,index,batch_size,augment=False):
         if augment:
-            return DataSet._augment(self.dataset_images[index]),self.dataset_labels[index]
-        return self.dataset_images[index],self.dataset_labels[index]
+            return DataSet._augment_batch(self.dataset_images[index: index+batch_size]),self.dataset_labels[index: index+batch_size]
+        return self.dataset_images[index: index+batch_size],self.dataset_labels[index: index+batch_size]
+    def get(self,indices,augment=False):
+        if augment:
+            return DataSet._augment_batch(self.dataset_images[indices]),self.dataset_labels[indices]
+        return self.dataset_images[indices],self.dataset_labels[indices]
 
 base=os.path.dirname(os.path.abspath(__file__)) # abspath return the absolute path of file with script name too ../scripy.py
 # print(base)
