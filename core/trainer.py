@@ -10,7 +10,7 @@ base=os.path.dirname(os.path.abspath(__file__)) # abspath return the absolute pa
 base_root=os.path.dirname(base)
 save_loc=os.path.join(base_root,"trainedModel") # need to add \ otherwise, trainedModel gets added to name
 class Trainer:
-    def __init__(self,NeuralNet:NeuralNet,train_dataset:DataSet,epochs=10,dataset=60000,mode="SGD", Visulaizer=False, save=False, save_loc=save_loc, batch_size=1, hyperparam=0.05, augment=False, per_update_cost=5, validation=True, per_update_validation=1000,shuffle=True):
+    def __init__(self,NeuralNet:NeuralNet,train_dataset:DataSet,epochs=10,dataset=60000,mode="SGD", Visulaizer=False, save=False, save_loc=save_loc, batch_size=1, hyperparam=0.05, augment=False, per_update_cost=5, validation=True, per_update_validation=1000,shuffle=True,optimizer=None):
         self.NN=NeuralNet
         self.dataset=train_dataset
         self.hyperparam=hyperparam
@@ -26,6 +26,7 @@ class Trainer:
         self.update_validation=per_update_validation
         self.validation=validation
         self.shuffle=shuffle
+        self.optimizer=optimizer
         if self.mode == "FGD" : self.batch_size = self.dataset_size
         if self.mode == "SGD" : self.batch_size = 1 # fixed bug when repetitive training on same interface page , if wsitch from mbg to sgd still train on old batch size
     def show_attrs(self):
@@ -51,6 +52,8 @@ class Trainer:
         update_vis_batch=0
         update_per_valid=max(1,self.update_validation//self.batch_size)
         iterations__times_effective=self.dataset_size//self.batch_size
+        final_grad_weights=[np.zeros_like(self.NN.weights_list[index]) for index in range(self.NN.num_layers-1)]
+        final_grad_bias=[np.zeros_like(self.NN.biases_list[index]) for index in range(self.NN.num_layers-1)]
         if self.visualizer ^ self.validation: 
             plt.ion()
             fig,ax=plt.subplots()
@@ -101,6 +104,7 @@ class Trainer:
             # print("\n") # uncheck for progress seperator
             running_sum=0
             samples_seen_vis=0
+            beta=0.99
             if not self.shuffle:
                 indices=np.arange(self.dataset_size)
             else:
@@ -130,9 +134,19 @@ class Trainer:
                         running_sum+=np.sum(cost)
                 """NOTE: validation now fixed (moved to after update), prev with batch>1 sigmoid error but not softmax?"""
                 avg_gradient_weights,avg_gradient_bias=self.NN.backward(expected_outcome) 
+                # final_grad_weights=np.zeros_like(avg_gradient_weights) # its a list not a array
+                # final_grad_bias=np.zeros_like(avg_gradient_bias)
+                if self.optimizer=="Momentum":
+                    for index in range(self.NN.num_layers-1):
+                        final_grad_weights[index]=(beta*final_grad_weights[index]+self.hyperparam*avg_gradient_weights[index])
+                        final_grad_bias[index]=(beta*final_grad_bias[index]+self.hyperparam*avg_gradient_bias[index])
+                else:
+                    for index in range(self.NN.num_layers-1):
+                        final_grad_weights[index]=self.hyperparam*avg_gradient_weights[index]
+                        final_grad_bias[index]=self.hyperparam*avg_gradient_bias[index]
                 for index in range(self.NN.num_layers-1):
-                    self.NN.weights_list[index]-=(self.hyperparam*avg_gradient_weights[index])
-                    self.NN.biases_list[index]-=(self.hyperparam*avg_gradient_bias[index])
+                    self.NN.weights_list[index]-=(final_grad_weights[index])
+                    self.NN.biases_list[index]-=(final_grad_bias[index])
                 if self.validation:
                     if iter%update_per_valid == 0: #and iter>0 not needed cuz valid update after weights update so iter == 0 is a datapoint
                         tester.testing()

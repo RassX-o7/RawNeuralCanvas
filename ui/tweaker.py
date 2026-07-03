@@ -63,13 +63,14 @@ class TrainingTweaker:
 
         ttk.Radiobutton(gd, text="Stochastic Descent", command=self.SGD_tweak,value=0, variable=self.defualt_DG).grid(row=0, column=0, sticky="w")
         ttk.Radiobutton(gd,text="Mini-Batch Descent",command=self.MGD_tweak,value=1, variable=self.defualt_DG).grid(row=1, column=0,sticky="w")
-        ttk.Radiobutton(gd, text="Full Batch Descent (ineffective without optimizer)",command=self.FBG_tweak, value=2, variable=self.defualt_DG).grid(row=2,column=0,sticky="w")
+        ttk.Radiobutton(gd, text="Full Batch Descent",command=self.FBG_tweak, value=2, variable=self.defualt_DG).grid(row=2,column=0,sticky="w")
 
         self.batch_subframe = ttk.Frame(gd)
         ttk.Label(self.batch_subframe, text="Batch size (max 1024):").grid(row=0, column=0,sticky="w")
         tk.Entry(self.batch_subframe, textvariable=self.mbg_var, width=5).grid(row=0,column=1, padx=4)
         ttk.Scale(self.batch_subframe,from_=1, variable=self.mbg_var, to=1024,orient="horizontal",length=220,command=lambda v:self.mbg_var.set(int(float(v)))).grid(row=1, column=0, columnspan=2, sticky="ew", pady=(2, 0))
         self.batch_subframe.columnconfigure(0, weight=1)
+
         left.columnconfigure(0, weight=1)
 
         right = ttk.LabelFrame(self.Frame1, text="Model Settings", padding=10)
@@ -91,10 +92,18 @@ class TrainingTweaker:
             row=3, column=0, columnspan=2, sticky="ew", pady=(0, 10))
 
         ttk.Label(right, text="Bias Initialization:").grid(row=4, column=0, columnspan=2, sticky="w")
-        ttk.Combobox(right,values=self.bias_init_types,textvariable=self.bias_init_var, state="readonly", width=24).grid( row=5,column=0, columnspan=2,sticky="ew")
-        right.columnconfigure(0, weight=1)
+        ttk.Combobox(right,values=self.bias_init_types,textvariable=self.bias_init_var, state="readonly", width=24).grid( row=5,column=0, columnspan=2,sticky="ew",pady=(0,10))
+
+        self.optimizer_types=["Momentum","None"]
+        self.optimizer_var=tk.StringVar(value=self.optimizer_types[-1])
+
+        ttk.Label(right,text="Optimizer Choice:",font=(None,9)).grid(row=6,column=0,sticky="w")
+        ttk.Label(right,text="Note: Recommended for larger batches and FBG",font=(None,8)).grid(row=7,column=0,sticky="w")
+        ttk.Combobox(right,values=self.optimizer_types,textvariable=self.optimizer_var, state="readonly", width=50).grid( row=8,column=0,sticky="w")
+
         self.shuffle=tk.BooleanVar(value=True)
-        ttk.Checkbutton(right, text="Training shuffler",variable=self.shuffle).grid(row=6, column=0,sticky="w",pady=(10,5))
+        ttk.Checkbutton(right, text="Training shuffler",variable=self.shuffle).grid(row=9, column=0,sticky="w",pady=(10,5))
+        right.columnconfigure(0, weight=1)
 
         self.Frame1.columnconfigure(0, weight=1)
         self.Frame1.columnconfigure(1,weight=1)
@@ -254,7 +263,7 @@ class TrainingTweaker:
 
         self.NN = NeuralNet(weights=weights, biases=biases,out_mode=self.out_mode.get())
         self.NN.show_attrs()
-        trainer = Trainer(self.NN, train_dataset,epochs=self.epoch_var.get(),dataset=self.dataset_var.get(),save=self.save_wb.get(),Visulaizer=self.train_visual.get(),mode=self.DG_type.get(),batch_size=self.mbg_var.get(),hyperparam=self.hyper_param.get(),augment=self.aug.get(),validation=self.valid_visual.get(),shuffle=self.shuffle.get())
+        trainer = Trainer(self.NN, train_dataset, epochs=self.epoch_var.get(), dataset=self.dataset_var.get(),save=self.save_wb.get(),Visulaizer=self.train_visual.get(),mode=self.DG_type.get(),batch_size=self.mbg_var.get(),hyperparam=self.hyper_param.get(),augment=self.aug.get(),validation=self.valid_visual.get(),shuffle=self.shuffle.get(),optimizer=self.optimizer_var.get() if self.optimizer_var.get()!=self.optimizer_types[-1] else None)
         trainer.show_attrs()
         trainer.train()
         self.app.model = self.NN
